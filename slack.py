@@ -5,7 +5,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from fastapi import APIRouter, Request
-from config import settings
+from config import settings, firestore_client
 from repositorys import InstallationStoreRepository, StateStoreRepository
 
 
@@ -28,7 +28,7 @@ app = AsyncApp(
         scopes=SCOPES,
         user_scopes=SLACK_USER_SCOPES,
         installation_store=InstallationStoreRepository(
-            logger=app_logger, app_id=APP_ID
+            client=firestore_client, logger=app_logger, app_id=APP_ID
         ),
         state_store=StateStoreRepository(
             logger=app_logger, expiration_seconds=300
