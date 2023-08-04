@@ -31,7 +31,7 @@ app = AsyncApp(
             client=firestore_client, logger=app_logger, app_id=APP_ID
         ),
         state_store=StateStoreRepository(
-            logger=app_logger, expiration_seconds=300
+            client=firestore_client, logger=app_logger, expiration_seconds=300
         ),
         install_path=f"/{APP_ID}/slack/install",
         redirect_uri_path=f"/{APP_ID}/slack/oauth_redirect"
