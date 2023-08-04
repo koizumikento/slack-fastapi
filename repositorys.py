@@ -81,7 +81,6 @@ class InstallationStoreRepository(AsyncInstallationStore):
             if (not app_repository.exists(self.app_id)):
                 app_repository.save(
                     self.app_id,
-                    i["user_id"],
                     {}
                 )
 
@@ -306,8 +305,11 @@ class AppConfigRepository:
     TABLE_NAME = "app_configs"
 
     def __init__(self, client: Client, team_id: str):
-        self.collection = TeamStoreRepository(client).collection.document(
+        self.collection: collection = TeamStoreRepository(client).collection.document(
             team_id).collection(self.TABLE_NAME)
+
+    def exists(self, app_id: str) -> bool:
+        return self.collection.document(app_id).get().exists
 
     def get(self, app_id: str):
         return {
@@ -326,7 +328,7 @@ class BotStoreRepository:
     TABLE_NAME = "bots"
 
     def __init__(self, client: Client, team_id: str):
-        self.collection = TeamStoreRepository(client).collection.document(
+        self.collection: collection = TeamStoreRepository(client).collection.document(
             team_id).collection(self.TABLE_NAME)
 
     def get(self, bot_id: str):
@@ -346,7 +348,7 @@ class UserConfigRepository:
     TABLE_NAME = "user_configs"
 
     def __init__(self, client: Client, team_id: str, app_id: str):
-        self.collection = AppConfigRepository(client, team_id).collection.document(
+        self.collection: collection = AppConfigRepository(client, team_id).collection.document(
             app_id).collection(self.TABLE_NAME)
 
     def get(self, user_id: str):
