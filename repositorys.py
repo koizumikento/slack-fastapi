@@ -177,10 +177,10 @@ class InstallationStoreRepository(AsyncInstallationStore):
 
 
 class StateStoreRepository(AsyncOAuthStateStore):
-    def __init__(self, expiration_seconds: int, logger: Logger):
+    def __init__(self, client: Client, expiration_seconds: int, logger: Logger):
         self.expiration_seconds = expiration_seconds
         self._logger = logger
-        self.state_repository = StateRepository()
+        self.state_repository = StateRepository(client)
 
     @property
     def logger(self) -> Logger:
@@ -215,7 +215,7 @@ class StateStoreRepository(AsyncOAuthStateStore):
 class StateRepository:
     TABLE_NAME = "states"
 
-    def __init__(self, client):
+    def __init__(self, client: Client):
         self.collection: collection = client.collection(
             self.TABLE_NAME
         )
