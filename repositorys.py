@@ -115,7 +115,7 @@ class InstallationStoreRepository(AsyncInstallationStore):
         is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Installation]:
         app_bot_repository = BotStoreRepository(
-            self.client, team_id, self.app_id)
+            self.client, team_id)
         enterprise = self.enterprise_repository.get(enterprise_id)
         team = self.team_repository.get(team_id)
         bot = app_bot_repository.get(self.app_id)
@@ -338,10 +338,10 @@ class BotStoreRepository:
         self.collection: collection = TeamStoreRepository(client).collection.document(
             team_id).collection(self.TABLE_NAME)
 
-    def get(self, bot_id: str):
+    def get(self, app_id: str):
         return {
-            **self.collection.document(bot_id).get().to_dict(),
-            "id": bot_id
+            **self.collection.document(app_id).get().to_dict(),
+            "id": app_id
         }
 
     def save(self, app_id: str, data: dict):
