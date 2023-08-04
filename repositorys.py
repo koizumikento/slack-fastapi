@@ -277,10 +277,14 @@ class EnterPriseRepository:
         self.collection = client.collection(self.TABLE_NAME)
 
     def get(self, enterprise_id: str):
-        return {
-            **self.collection.document(enterprise_id).get().to_dict(),
-            "id": enterprise_id
-        }
+        doc = self.collection.document(enterprise_id).get()
+        if doc.exists:
+            return {
+                **doc.to_dict(),
+                "id": enterprise_id
+            }
+        else:
+            return None
 
     def save(self, enterprise_id: str, data: dict):
         self.collection.document(enterprise_id).set(data)
@@ -296,10 +300,14 @@ class TeamStoreRepository:
         self.collection = client.collection(self.TABLE_NAME)
 
     def get(self, team_id: str):
-        return {
-            **self.collection.document(team_id).get().to_dict(),
-            "id": team_id
-        }
+        doc = self.collection.document(team_id).get()
+        if doc.exists:
+            return {
+                **doc.to_dict(),
+                "id": team_id
+            }
+        else:
+            return None
 
     def save(self, team_id: str, data: dict):
         self.collection.document(team_id).set(data)
@@ -319,10 +327,14 @@ class AppConfigRepository:
         return self.collection.document(app_id).get().exists
 
     def get(self, app_id: str):
-        return {
-            **self.collection.document(app_id).get().to_dict(),
-            "id": app_id
-        }
+        doc = self.collection.document(app_id).get()
+        if doc.exists:
+            return {
+                **doc.to_dict(),
+                "id": app_id
+            }
+        else:
+            return None
 
     def save(self, app_id: str, data: dict):
         self.collection.document(app_id).set(data)
@@ -339,10 +351,14 @@ class BotStoreRepository:
             team_id).collection(self.TABLE_NAME)
 
     def get(self, app_id: str):
-        return {
-            **self.collection.document(app_id).get().to_dict(),
-            "id": app_id
-        }
+        doc = self.collection.document(app_id).get()
+        if doc.exists:
+            return {
+                **doc.to_dict(),
+                "id": app_id
+            }
+        else:
+            return None
 
     def save(self, app_id: str, data: dict):
         self.collection.document(app_id).set(data)
