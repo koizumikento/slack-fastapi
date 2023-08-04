@@ -359,10 +359,14 @@ class UserConfigRepository:
             app_id).collection(self.TABLE_NAME)
 
     def get(self, user_id: str):
-        return {
-            **self.collection.document(user_id).get().to_dict(),
-            "id": user_id
-        }
+        doc = self.collection.document(user_id).get()
+        if doc.exists:
+            return {
+                "user_id": user_id,
+                **doc.to_dict()
+            }
+        else:
+            return None
 
     def save(self, user_id: str, data: dict):
         self.collection.document(user_id).set(data)
