@@ -12,6 +12,7 @@ from typing import Optional
 
 class InstallationStoreRepository(AsyncInstallationStore):
     def __init__(self, *, client: Client, logger: Logger, app_id: str, ):
+        self.client = client
         self.team_repository = TeamStoreRepository(client)
         self.enterprise_repository = EnterPriseRepository(client)
         self._logger = logger
@@ -54,10 +55,12 @@ class InstallationStoreRepository(AsyncInstallationStore):
             )
 
         if (i["team_id"] is not None):
-            app_bot_repository = AppConfigRepository(i["team_id"])
-            app_repository = AppConfigRepository(i["team_id"])
+            app_bot_repository = AppConfigRepository(self.client, i["team_id"])
+            app_repository = AppConfigRepository(self.client, i["team_id"])
             user_repository = AppConfigRepository(
-                team_id=i["team_id"], app_id=self.app_id)
+                client=self.client,
+                team_id=i["team_id"], app_id=self.app_id
+            )
 
             self.team_repository.save(
                 i["team_id"], {
@@ -105,7 +108,8 @@ class InstallationStoreRepository(AsyncInstallationStore):
         user_id: Optional[str] = None,
         is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Installation]:
-        app_bot_repository = BotStoreRepository(team_id)
+        app_bot_repository = BotStoreRepository(
+            self.client, team_id, self.app_id)
         enterprise = self.enterprise_repository.get(enterprise_id)
         team = self.team_repository.get(team_id)
         bot = app_bot_repository.get(self.app_id)
@@ -155,7 +159,8 @@ class InstallationStoreRepository(AsyncInstallationStore):
         team_id: Optional[str],
     ) -> None:
         self.team_repository.delete(team_id=team_id)
-        user_repo = UserConfigRepository(team_id=team_id, app_id=self.app_id)
+        user_repo = UserConfigRepository(
+            client=self.client, team_id=team_id, app_id=self.app_id)
         users = user_repo.get_all()
         for user in users:
             user_repo.delete(user_id=user["user_id"])
@@ -167,9 +172,11 @@ class InstallationStoreRepository(AsyncInstallationStore):
         team_id: Optional[str],
         user_id: Optional[str] = None,
     ) -> None:
-        app_bot_repository = BotStoreRepository(team_id)
+        app_bot_repository = BotStoreRepository(
+            client=self.client, team_id=team_id, app_id=self.app_id)
         app_bot_repository.delete(self.app_id)
-        user_repo = UserConfigRepository(team_id=team_id, app_id=self.app_id)
+        user_repo = UserConfigRepository(
+            client=self.client, team_id=team_id, app_id=self.app_id)
         user_repo.delete(user_id=user_id)
 
     async def async_delete_all(self, *, enterprise_id: str | None, team_id: str | None):
