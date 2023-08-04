@@ -2,7 +2,7 @@ from slack_sdk.oauth.installation_store.async_installation_store import AsyncIns
 from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
 from slack_sdk.oauth.installation_store import Installation, Bot
 from google.cloud.firestore import Client
-from google.cloud.firestore_v1 import collection
+from google.cloud.firestore_v1 import CollectionReference
 from logging import Logger
 from datetime import datetime  # type: ignore
 from uuid import uuid4
@@ -229,7 +229,7 @@ class StateRepository:
     TABLE_NAME = "states"
 
     def __init__(self, client: Client):
-        self.collection: collection = client.collection(
+        self.collection: CollectionReference = client.collection(
             self.TABLE_NAME
         )
 
@@ -320,7 +320,7 @@ class AppConfigRepository:
     TABLE_NAME = "app_configs"
 
     def __init__(self, client: Client, team_id: str):
-        self.collection: collection = TeamStoreRepository(client).collection.document(
+        self.collection: CollectionReference = TeamStoreRepository(client).collection.document(
             team_id).collection(self.TABLE_NAME)
 
     def exists(self, app_id: str) -> bool:
@@ -347,7 +347,7 @@ class BotStoreRepository:
     TABLE_NAME = "bots"
 
     def __init__(self, client: Client, team_id: str):
-        self.collection: collection = TeamStoreRepository(client).collection.document(
+        self.collection: CollectionReference = TeamStoreRepository(client).collection.document(
             team_id).collection(self.TABLE_NAME)
 
     def get(self, app_id: str):
@@ -371,7 +371,7 @@ class UserConfigRepository:
     TABLE_NAME = "user_configs"
 
     def __init__(self, client: Client, team_id: str, app_id: str):
-        self.collection: collection = AppConfigRepository(client, team_id).collection.document(
+        self.collection: CollectionReference = AppConfigRepository(client, team_id).collection.document(
             app_id).collection(self.TABLE_NAME)
 
     def get(self, user_id: str):
