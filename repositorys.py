@@ -8,6 +8,10 @@ from datetime import datetime  # type: ignore
 from uuid import uuid4
 import time
 from typing import Optional
+from logging import getLogger
+
+
+logger = getLogger("slack-app")
 
 
 class InstallationStoreRepository(AsyncInstallationStore):
@@ -248,8 +252,11 @@ class StateRepository:
             s = self.collection.document(state).get()
             s.to_dict()["expire_at"] = s.to_dict()[
                 "expire_at"].replace(tzinfo=None)
-
+            logger.debug(f"now: {now}")
+            logger.debug(
+                f"expire_at: {datetime.fromtimestamp(s.to_dict()['expire_at'].timestamp())}")
             if datetime.fromtimestamp(s.to_dict()["expire_at"].timestamp()) >= now:
+                logger.debug(f"Found state: {s.to_dict()}")
                 return True
             else:
                 return False
