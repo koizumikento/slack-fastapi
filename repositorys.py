@@ -55,11 +55,14 @@ class InstallationStoreRepository(AsyncInstallationStore):
             )
 
         if (i["team_id"] is not None):
-            app_bot_repository = AppConfigRepository(self.client, i["team_id"])
-            app_repository = AppConfigRepository(self.client, i["team_id"])
-            user_repository = AppConfigRepository(
+            app_bot_repository = BotStoreRepository(
+                client=self.client, team_id=i["team_id"])
+            app_repository = AppConfigRepository(
+                client=self.client, team_id=i["team_id"])
+            user_repository = UserConfigRepository(
                 client=self.client,
-                team_id=i["team_id"], app_id=self.app_id
+                team_id=i["team_id"],
+                app_id=self.app_id
             )
 
             self.team_repository.save(
@@ -322,9 +325,9 @@ class AppConfigRepository:
 class BotStoreRepository:
     TABLE_NAME = "bots"
 
-    def __init__(self, client: Client, team_id: str, app_id: str):
-        self.collection = AppConfigRepository(client, team_id).collection.document(
-            app_id).collection(self.TABLE_NAME)
+    def __init__(self, client: Client, team_id: str):
+        self.collection = TeamStoreRepository(client).collection.document(
+            team_id).collection(self.TABLE_NAME)
 
     def get(self, bot_id: str):
         return {
@@ -332,11 +335,11 @@ class BotStoreRepository:
             "id": bot_id
         }
 
-    def save(self, bot_id: str, data: dict):
-        self.collection.document(bot_id).set(data)
+    def save(self, app_id: str, data: dict):
+        self.collection.document(app_id).set(data)
 
-    def delete(self, bot_id: str):
-        self.collection.document(bot_id).delete()
+    def delete(self, app_id: str):
+        self.collection.document(app_id).delete()
 
 
 class UserConfigRepository:
