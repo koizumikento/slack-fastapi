@@ -6,7 +6,7 @@ from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from fastapi import APIRouter, Request
 from config import settings, firestore_client
-from repositorys import InstallationStoreRepository, StateStoreRepository
+from repositorys import InstallationStoreRepository, StateStoreRepository, AppConfigRepository, BotStoreRepository
 
 
 app_logger: Logger = getLogger("slack-app")
@@ -48,6 +48,25 @@ api = APIRouter(
 async def app_mention(body: dict, say: AsyncSay, logger: Logger, client: AsyncWebClient):
     logger.info(body)
     await say("Hi there!")
+
+
+@app.event("app_uninstalled")
+async def handle_app_uninstalled(event, logger: Logger, body: dict):
+    app_logger.debug(f"App uninstalled event: {event}")
+    app_logger.debug(f"App uninstalled body: {body}")
+    team_id = body["team_id"]
+    app_id = body["api_app_id"]
+    try:
+        app_logger.debug(f"uninstall: {app_id}, {team_id}")
+        app_repository = AppConfigRepository(
+            client=firestore_client, team_id=team_id)
+        app_bot_repository = BotStoreRepository(
+            client=firestore_client, team_id=team_id)
+
+        app_bot_repository.delete(app_id=app_id)
+        app_repository.delete(app_id=app_id)
+    except Exception as e:
+        app_logger.debug(f"Error handling app uninstalled: {e}")
 
 
 @api.post("/slack/events")
