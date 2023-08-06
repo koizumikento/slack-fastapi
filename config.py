@@ -7,17 +7,17 @@ from google.cloud import firestore
 
 
 logger_client: Logger = logging.Client()
-logger_client.setup_logging(log_level=DEBUG)
+log_level = DEBUG if os.getenv("LOGLEVEL") == "DEBUG" else INFO
+logger_client.setup_logging(log_level=log_level)
 firestore_client = firestore.Client()
-log_level = DEBUG if os.environ.get("LOGLEVEL") == "DEBUG" else INFO
 basicConfig(level=log_level)
 
 
 class Settings(BaseSettings):
-    APP_ID: str = os.environ.get("APP_ID", "")
-    CLIENT_ID: str = os.environ.get("CLIENT_ID", "")
-    CLIENT_SECRET: str = os.environ.get("CLIENT_SECRET", "")
-    SIGNING_SECRET: str = os.environ.get("SIGNING_SECRET", "")
+    APP_ID: str = os.getenv("APP_ID", "")
+    CLIENT_ID: str = os.getenv("CLIENT_ID", "")
+    CLIENT_SECRET: str = os.getenv("CLIENT_SECRET", "")
+    SIGNING_SECRET: str = os.getenv("SIGNING_SECRET", "")
 
 
 settings = Settings().model_dump()
