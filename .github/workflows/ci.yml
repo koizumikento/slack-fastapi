@@ -1,0 +1,23 @@
+name: Runtime compatibility
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+jobs:
+  docker-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build runtime image
+        run: docker build --pull --no-cache -t slack-fastapi:test .
+      - name: Check installed dependencies
+        run: docker run --rm --entrypoint python slack-fastapi:test -m pip check
+      - name: Run full test suite
+        run: docker run --rm --entrypoint python slack-fastapi:test -m pytest -q
